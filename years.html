@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
  <head>
    <title>alt-AAPB</title>
    <meta charset="UTF-8">
@@ -20,6 +20,9 @@
 	  fill: none;
 	  stroke: steelblue;
 	  stroke-width: 1.5px;
+	}
+	.line:hover {
+	  stroke-width: 3px;
 	}
 	
    </style>
@@ -170,7 +173,10 @@
           return {year: year, count: facet_maps[term][year] || 0}
         });
         console.log(datum);
-        svg.append("path")
+        svg.append("a")
+          .attr("xlink:href", "http://americanarchive.org/catalog?q=" + term)
+          .attr("title", term)
+        .append("path")
           .datum(datum)
           .attr("class", "line")
           .attr("d", line);
