@@ -4,14 +4,24 @@
    <title>alt-AAPB</title>
    <meta charset="UTF-8">
    <style>
-    .chart div {
+   
+	body {
 	  font: 10px sans-serif;
-	  background-color: steelblue;
-	  text-align: right;
-	  padding: 3px;
-	  margin: 1px;
-	  color: white;
 	}
+
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+
+	.line {
+	  fill: none;
+	  stroke: steelblue;
+	  stroke-width: 1.5px;
+	}
+	
    </style>
  </head>
  
@@ -24,48 +34,52 @@
     <input type="submit" value="Compare"/>
   </form>
   
+  <br/>
+  
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  
   <script>
     // https://github.com/d3/d3-plugins/blob/master/jsonp/jsonp.js
     // CORS is prefered, but this still works
-	d3.jsonp = function (url, callback) {
-	  function rand() {
-		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-		  c = '', i = -1;
-		while (++i < 15) c += chars.charAt(Math.floor(Math.random() * 52));
-		return c;
-	  }
+    d3.jsonp = function (url, callback) {
+      function rand() {
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+          c = '', i = -1;
+        while (++i < 15) c += chars.charAt(Math.floor(Math.random() * 52));
+        return c;
+      }
 
-	  function create(url) {
-		var e = url.match(/callback=d3.jsonp.(\w+)/),
-		  c = e ? e[1] : rand();
-		d3.jsonp[c] = function(data) {
-		  callback(data);
-		  delete d3.jsonp[c];
-		  script.remove();
-		};
-		return 'd3.jsonp.' + c;
-	  }
+      function create(url) {
+        var e = url.match(/callback=d3.jsonp.(\w+)/),
+          c = e ? e[1] : rand();
+        d3.jsonp[c] = function(data) {
+          callback(data);
+          delete d3.jsonp[c];
+          script.remove();
+        };
+        return 'd3.jsonp.' + c;
+      }
 
-	  var cb = create(url),
-		script = d3.select('head')
-		.append('script')
-		.attr('type', 'text/javascript')
-		.attr('src', url.replace(/(\{|%7B)callback(\}|%7D)/, cb));
-	};
+      var cb = create(url),
+        script = d3.select('head')
+        .append('script')
+        .attr('type', 'text/javascript')
+        .attr('src', url.replace(/(\{|%7B)callback(\}|%7D)/, cb));
+    };
   </script>
+  
   <script>
     
     function to_hash(a) {
-	  var temp = a.slice();
-	  var hash = {};
-	  while (temp.length) {
-	    var key = temp.shift();
-	    var val = temp.shift();
-		hash[key] = val
-	  }
-	  return hash;
-	}
+      var temp = a.slice();
+      var hash = {};
+      while (temp.length) {
+        var key = temp.shift();
+        var val = temp.shift();
+        hash[key] = val
+      }
+      return hash;
+    }
   
     var terms = decodeURIComponent(location.search.replace('?terms=',''))
       .split(/\W+/); // TODO: split on comma; see if we can handle multi-word queries.
@@ -84,17 +98,76 @@
     }).join('&');
     
     var url = [base, fqs, fields].join('&');
-    console.log(url);
     
     d3.jsonp(url, function(response) {
       var facet_fields = response.facet_counts.facet_fields
       var facet_maps = {};
+      var facet_keys = [];
+      var facet_values = [];
       Object.keys(facet_fields).forEach(function(term){
-        facet_maps[term] = to_hash(facet_fields[term]);
+        var hash = to_hash(facet_fields[term]);
+        facet_maps[term] = hash;
+        facet_keys = facet_keys.concat(Object.keys(hash));
+        facet_values = facet_values.concat(Object.keys(hash).map(function(key){
+          return hash[key];
+        }));
       });
       
-      console.log(facet_maps);
-	});
+      var year_min = Math.min.apply(null, facet_keys);
+      var year_max = Math.max.apply(null, facet_keys);
+      var count_max = Math.max.apply(null, facet_values);
+      
+      // **************************
+      
+      var margin = {top: 20, right: 20, bottom: 30, left: 50};
+      var width = window.innerWidth - margin.left - margin.right - 100;
+      var height = window.innerHeight - margin.top - margin.bottom - 100;
+      
+      d3.select("body").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom);
+
+      var x = d3.scale.linear()
+          .range([0, width]);
+
+      var y = d3.scale.linear()
+          .range([height, 0]);
+
+      var xAxis = d3.svg.axis()
+          .tickFormat(d3.format("d"))
+          .scale(x)
+          .orient("bottom");
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left");
+
+//       var line = d3.svg.line()
+//           .x(function(d) { return x(d.date); })
+//           .y(function(d) { return y(d.close); });
+
+      var svg = d3.select("svg");
+
+      x.domain([year_min,year_max]);
+      y.domain([0,count_max]);
+
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(" + margin.left + "," + (margin.top + height) + ")")
+          .call(xAxis);
+
+      svg.append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+          .call(yAxis);
+
+//         svg.append("path")
+//             .datum(data)
+//             .attr("class", "line")
+//             .attr("d", line);
+
+
+    });
   </script>
  </body>
 </html>
