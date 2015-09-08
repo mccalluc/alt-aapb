@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>alt-AAPB</title>
+   <meta charset="UTF-8">
+   <style>
+    .chart div {
+	  font: 10px sans-serif;
+	  background-color: steelblue;
+	  text-align: right;
+	  padding: 3px;
+	  margin: 1px;
+	  color: white;
+	}
+   </style>
+ </head>
+ 
+ <body>
+ 
+  <div class="chart"></div>
+  
+  <form>
+    <input name="terms"/>
+    <input type="submit" value="Compare"/>
+  </form>
+  
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+    // https://github.com/d3/d3-plugins/blob/master/jsonp/jsonp.js
+    // CORS is prefered, but this still works
+	d3.jsonp = function (url, callback) {
+	  function rand() {
+		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+		  c = '', i = -1;
+		while (++i < 15) c += chars.charAt(Math.floor(Math.random() * 52));
+		return c;
+	  }
+
+	  function create(url) {
+		var e = url.match(/callback=d3.jsonp.(\w+)/),
+		  c = e ? e[1] : rand();
+		d3.jsonp[c] = function(data) {
+		  callback(data);
+		  delete d3.jsonp[c];
+		  script.remove();
+		};
+		return 'd3.jsonp.' + c;
+	  }
+
+	  var cb = create(url),
+		script = d3.select('head')
+		.append('script')
+		.attr('type', 'text/javascript')
+		.attr('src', url.replace(/(\{|%7B)callback(\}|%7D)/, cb));
+	};
+  </script>
+  <script>
+    
+    function to_hash(a) {
+	  var temp = a.slice();
+	  var hash = {};
+	  while (temp.length) {
+	    var key = temp.shift();
+	    var val = temp.shift();
+		hash[key] = val
+	  }
+	  return hash;
+	}
+  
+    var terms = decodeURIComponent(location.search.replace('?terms=',''))
+      .split(/\W+/); // TODO: split on comma; see if we can handle multi-word queries.
+      
+    d3.select('input').attr('value',terms.join(', '));
+    
+    var base = 'http://americanarchive.org/api.json?callback={callback}&facet=true';
+    var fqs = terms.map(function(term){
+      return 'fq[]={!tag=' + term + '}' + term;
+    }).join('&');
+    var fields = terms.map(function(key){
+      var ex = terms.filter(function(other){
+        return other !== key
+      }).join(',');
+      return 'facet.field[]={!ex=' + ex + '%20key=' + key + '}year';
+    }).join('&');
+    
+    var url = [base, fqs, fields].join('&');
+    console.log(url);
+    
+    d3.jsonp(url, function(response) {
+      var facet_fields = response.facet_counts.facet_fields
+      var facet_maps = {};
+      Object.keys(facet_fields).forEach(function(term){
+        facet_maps[term] = to_hash(facet_fields[term]);
+      });
+      
+      console.log(facet_maps);
+	});
+  </script>
+ </body>
+</html>
