@@ -6,7 +6,7 @@
    <style>
    
 	body {
-	  font: 10px sans-serif;
+	  font: 15px sans-serif;
 	}
 
 	.axis path,
@@ -125,7 +125,7 @@
       
       var margin = {top: 20, right: 20, bottom: 30, left: 50};
       var width = window.innerWidth - margin.left - margin.right - 20;
-      var height = window.innerHeight - margin.top - margin.bottom - 100;
+      var height = window.innerHeight - margin.top - margin.bottom - 70;
       
       d3.select("body").append("svg")
           .attr("width", width + margin.left + margin.right)
@@ -160,20 +160,35 @@
       for(var year = year_min; year <= year_max; year++){
         years.push(year);
       }
+      var key_y = 50;
       Object.keys(facet_maps).forEach(function(term){
         var datum = years.map(function(year){
           return {year: year, count: facet_maps[term][year] || 0}
         });
         var color = colors.shift();
         colors.push(color); // Rotate
-        svg.append("a")
+        
+        // svg.append("rect")
+//           .attr({"width": 50, "height": 20, "x": 100, "y": key_y, "style": "fill: " + color});
+//         svg.append("text")
+//           .attr({"x": 170, "y": key_y + 15})
+//           .text(term);
+//         key_y += 30;
+        
+        var link = svg.append("a")
           .attr("xlink:href", "http://americanarchive.org/catalog?q=" + term)
-          .attr("title", term)
-        .append("path")
+          .attr("title", term);
+        link.append("path")
           .datum(datum)
           .attr("class", "line")
           .attr("d", line)
           .attr("style", "stroke: " + color);
+        link.append("rect")
+           .attr({"width": 50, "height": 20, "x": 100, "y": key_y, "style": "fill: " + color});
+        link.append("text")
+           .attr({"x": 170, "y": key_y + 15})
+           .text(term);
+         key_y += 30;
       });
       
       // Axes layered above graphs.
