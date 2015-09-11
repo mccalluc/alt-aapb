@@ -1,5 +1,6 @@
 var terms = decodeURIComponent(location.search.replace('?terms=',''))
-  .split(/\W+/); // TODO: split on comma; see if we can handle multi-word queries.
+  .split(/\W+/).filter(function(s){return s.length > 0});
+  // TODO: split on comma; see if we can handle multi-word queries.
   
 d3.select('input').attr('value',terms.join(', '));
 
