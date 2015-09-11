@@ -11,7 +11,7 @@ var fields = terms.map(function(key){
   var ex = terms.filter(function(other){
     return other !== key
   }).join(',');
-  return 'facet.field[]={!ex=' + ex + '%20key=' + key + '}year';
+  return 'facet.field[]={!key=' + key + '%20ex=' + ex + '}year';
 }).join('&');
 
 var url = [base, fqs, fields].join('&');
