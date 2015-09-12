@@ -15,8 +15,10 @@ for (var a=0; a<terms.length; a++) {
 // MOCK:
 var counts = {};
 pairs.forEach(function(pair){
-  counts[pair] = Math.pow(Math.random(),2) * 100;
+  counts[pair] = Math.pow(Math.random(),2) * 10000;
 });
+
+  var max = Math.max.apply(null,Object.keys(counts).map(function(key){return counts[key]}));
 
   d3.select("body").append("svg")
       .attr("width", window.innerWidth)
@@ -40,6 +42,6 @@ pairs.forEach(function(pair){
       var key = [terms[a],terms[b]].sort().join('-');
       svg.append("path")
         .attr("d", "M "+ax+" "+ay+" A 250 200, 0, 0, "+sweep+", "+bx+" "+by)
-        .attr("style", "stroke-width: "+(counts[key])/10);
+        .attr("style", "stroke-width: "+10*(counts[key])/max);
     }
   }
