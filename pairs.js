@@ -12,12 +12,15 @@ for (var a=0; a<terms.length; a++) {
   }
 }
 
-// MOCK:
-var counts = {};
-pairs.forEach(function(pair){
-  counts[pair] = Math.pow(Math.random(),2) * 10000;
-});
+var base = 'http://americanarchive.org/api.js?facet=true';
+var fqs = pairs.map(function(pair){
+  var q = pair.split('-').join('+AND+');
+  return 'facet.query[]={!key='+pair+'}'+q;
+}).join('&');
 
+d3.jsonp(base+'&'+fqs);
+function callback(response){
+  var counts = response.facet_counts.facet_queries;
   var max = Math.max.apply(null,Object.keys(counts).map(function(key){return counts[key]}));
 
   d3.select("body").append("svg")
@@ -39,9 +42,16 @@ pairs.forEach(function(pair){
       var bx = 80 * Math.cos(2*Math.PI*b/n + rotation);
       var by = 100 * Math.sin(2*Math.PI*b/n + rotation);
       var sweep = 0;
-      var key = [terms[a],terms[b]].sort().join('-');
-      svg.append("path")
-        .attr("d", "M "+ax+" "+ay+" A 250 200, 0, 0, "+sweep+", "+bx+" "+by)
+      var ab = [terms[a],terms[b]].sort();
+      var key = ab.join('-');
+      var q = ab.join('+AND+');
+      var title = ab.join(' + ')+': '+counts[key];
+      svg.append("a")
+        .attr("xlink:href", "http://americanarchive.org/catalog?q=" + q)
+        .attr("title", title)
+      .append("path")
+        .attr("d", "M "+ax+" "+ay+" A 150 200, 0, 0, "+sweep+", "+bx+" "+by)
         .attr("style", "stroke-width: "+10*(counts[key])/max);
     }
   }
+}
