@@ -20,7 +20,7 @@ var states = [
   {'name': 'California', 'x': 80, 'y': 300, 'data': mock_data},
   {'name': 'Nevada', 'x': 140, 'y': 240, 'data': mock_data},
   {'name': 'Oregon', 'x': 100, 'y': 120, 'data': mock_data},
-  {'name': 'Washington','x': 120, 'y': 40, 'data': mock_data},
+  {'name': 'Washington','x': 120, 'y': 55, 'data': mock_data},
   {'name': 'Alaska', 'x': 120, 'y': 500, 'data': mock_data},
   {'name': 'Hawaii', 'x': 300, 'y': 540, 'data': mock_data},
   {'name': 'New Mexico', 'x': 300, 'y': 360, 'data': mock_data},
@@ -51,14 +51,23 @@ var states = [
   {'name': 'Wisconsin', 'x': 580, 'y': 150, 'data': mock_data},
   {'name': 'Michigan', 'x': 660, 'y': 170, 'data': mock_data},
   {'name': 'Virginia', 'x': 770, 'y': 285, 'data': mock_data},
-  {'name': 'Maryland', 'x': 820, 'y': 265, 'data': mock_data},
+  {'name': 'DC', 'x': 820, 'y': 265, 'data': mock_data},
   {'name': 'Pennsylvania', 'x': 785, 'y': 215, 'data': mock_data},
   {'name': 'New York', 'x': 810, 'y': 150, 'data': mock_data},
   {'name': 'New Jersey', 'x': 845, 'y': 215, 'data': mock_data},
-  {'name': 'DC', 'x': 870, 'y': 255, 'data': mock_data},
+  {'name': 'Maryland', 'x': 870, 'y': 255, 'data': mock_data},
   {'name': 'Connecticut', 'x': 895, 'y': 205, 'data': mock_data},
   {'name': 'Rhode Island', 'x': 920, 'y': 155, 'data': mock_data},
   {'name': 'Massachusetts', 'x': 870, 'y': 165, 'data': mock_data},
+  {'name': 'Maine', 'x': 920, 'y': 85, 'data': mock_data},
+  {'name': 'Vermont', 'x': 870, 'y': 95, 'data': mock_data},
+  {'name': 'New Hampshire', 'x': 830, 'y': 105, 'data': mock_data},
+  
+  {'name': 'Kentucky', 'x': 680, 'y': 300, 'data': mock_data},
+  {'name': 'Tennessee', 'x': 645, 'y': 340, 'data': mock_data},
+  {'name': 'North Carolina', 'x': 800, 'y': 330, 'data': mock_data},
+  {'name': 'Florida', 'x': 760, 'y': 490, 'data': mock_data},
+  
 ];
 
 for (var i=0; i<states.length; i++) {
