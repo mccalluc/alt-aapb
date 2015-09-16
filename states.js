@@ -113,6 +113,6 @@ function callback(response) {
           .attr("class", "slice")
         .append("path")
           .attr("d", d3.svg.arc().outerRadius(30))
-          .style("fill", function(state) { return color(state_data.data.term); });
+          .style("fill", function(state) { return color(state.data.term); });
   });
 }
