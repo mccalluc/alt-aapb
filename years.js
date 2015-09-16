@@ -19,7 +19,7 @@ var url = [base, fqs, fields].join('&');
 
 d3.jsonp(url);
 function callback(response) {
-  var facet_fields = response.facet_counts.facet_fields
+  var facet_fields = response.facet_counts.facet_fields;
   var facet_maps = {};
   var facet_keys = [];
   var facet_values = [];
