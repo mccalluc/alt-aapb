@@ -33,10 +33,10 @@ function callback(response) {
     var sum = 0
     states[state] = terms.map(function(term){
       var count = facet_maps[term][state];
-      sum += count
+      sum += count || 0;
       return {'term': term, 'count': count};
     });
-    sums.push[sum];
+    sums.push(sum);
   });
   var max_sum =  Math.max.apply(null, sums);
   
@@ -107,12 +107,14 @@ function callback(response) {
           .attr("transform", "translate(" + state_data.x + "," + state_data.y + ")")
           .attr("title", state_data.name);
 
+      var counts = state_data.data.map(function(slice){return slice.count});
+      var sum = counts.reduce(function(a, b) {return a + b});
       g.selectAll(".slice")
           .data(pie(state_data.data))
         .enter().append("g")
           .attr("class", "slice")
         .append("path")
-          .attr("d", d3.svg.arc().outerRadius(30))
+          .attr("d", d3.svg.arc().outerRadius(6 * Math.sqrt(100 * sum/max_sum)))
           .style("fill", function(state) { return color(state.data.term); });
   });
 }
